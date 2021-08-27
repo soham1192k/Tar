@@ -14,6 +14,8 @@ A simple and lightweight implementation of the tar utility, using C.
 - Run the `run_test.sh`script. If after extraction, the file contents match the original file contents, we get a success message on the console.
 
 ## How to run(Terminal):
+First compile using `gcc myTar.c -o myTar -lm`
+Then:
 - `./myTar -c <path of a directory> <tar filename>`
 - `./myTar -d <tar filepath>`
 - `./myTar -e <tar filepath> <single filename>`
