@@ -2,10 +2,10 @@
 A simple and lightweight implementation of the tar utility, using C.
 
 ## Functionalities:
-[-] Creation : Use the -c flag.
-[-] Extraction : Use the -d flag.
-[-] Extraction of a single file : Use the -e flag.
-[-] List tar info : Use the -l flag.
+- Creation : Use the -c flag.
+- Extraction : Use the -d flag.
+- Extraction of a single file : Use the -e flag.
+- List tar info : Use the -l flag.
 
 ## How to run(Using makefile):
 - Add the desired test case in "Test".
