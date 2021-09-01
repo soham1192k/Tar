@@ -44,9 +44,6 @@ int main(int argc,char* argv[])
 
         int size=strlen(argv[2])+1+strlen(argv[3])+1;
 
-        //path stores the path of the directory in which we need to have the tar file.
-        char *path=argv[2];
-
         //actualpath stores the absolute path of the required tar file.
         char *actualpath=malloc(size);
         strcpy(actualpath,argv[2]);strcat(actualpath,"/");strcat(actualpath,argv[3]);
@@ -54,6 +51,7 @@ int main(int argc,char* argv[])
         int src_fd,dst_fd,n,err;
 
         //opening the required directory
+        //Reference: Stack overflow
         struct dirent *pDirent;
         DIR *pDir;
         pDir=opendir(argv[2]);
@@ -169,9 +167,6 @@ int main(int argc,char* argv[])
             error(-1,'d');
         }
 
-        struct dirent *pDirent;
-        DIR *pDir;
-
         //folderpath stores the path of the directory
         char *folderpath=(char*)malloc(strlen(argv[2]));
         int pos=-1;
@@ -183,12 +178,6 @@ int main(int argc,char* argv[])
         }
         for(int i=0;i<=pos;i++){
             folderpath[i]=argv[2][i];
-        }
-
-        //opening the directory
-        pDir=opendir(folderpath);
-        if(pDir==NULL){
-            error(-1,'d');
         }
 
         //name contains the name of the tar file+"Dump"
@@ -224,7 +213,6 @@ int main(int argc,char* argv[])
         err=read(src_fd,buffer,1);
         error(err,'d');
         strcpy(filecount,buffer);
-        // free(buffer);
 
         while(1){
             buffer=(char*)malloc(1*sizeof(char));
@@ -236,7 +224,6 @@ int main(int argc,char* argv[])
                 break;
             }
             strcat(filecount,buffer);
-            // free(buffer);
         }
         int fcount=atoi(filecount);//converting the filecount to an integer
         
@@ -245,13 +232,12 @@ int main(int argc,char* argv[])
             
             //to store the file size
             //keep reading till we encounter a new line
-            char* filesize=(char*)malloc(15*sizeof(char));
+            char* filesize=(char*)malloc(11*sizeof(char));
             buffer=(char*)malloc(1*sizeof(char));
             err=read(src_fd,buffer,1);
             error(err,'d');
             if(err==0) break;
             strcpy(filesize,buffer);
-            // free(buffer);
 
             while(1){
             
@@ -264,17 +250,15 @@ int main(int argc,char* argv[])
                     break;
                 }
                 strcat(filesize,buffer);
-                // free(buffer);
             }
             int fsize=atoi(filesize);//converting the file size to integer
             
             //to store the filename
-            char* filename=(char*)malloc(20*sizeof(char));
+            char* filename=(char*)malloc(21*sizeof(char));
             buffer=(char*)malloc(1*sizeof(char));
             err=read(src_fd,buffer,1);
             error(err,'d');
             strcpy(filename,buffer);
-            // free(buffer);
 
             while(1){
                 buffer=(char*)malloc(1*sizeof(char));
@@ -286,7 +270,6 @@ int main(int argc,char* argv[])
                     break;
                 }
                 strcat(filename,buffer);
-                // free(buffer);
             }
 
             int remaining=fsize;
@@ -301,15 +284,17 @@ int main(int argc,char* argv[])
             //while we have unread bytes
             while(remaining>0){
             
-                char* buffer2 = (char*) malloc(4096 * sizeof(char));
+                // char* buffer2 = (char*) malloc(4096 * sizeof(char));
+                buffer=(char*)malloc(4096*sizeof(char));
+                
                 //if we have less than 4096 bytes to be read, read reamining number of bytes
                 if(remaining<=4096){
-                    err=read(src_fd,buffer2,remaining);
+                    err=read(src_fd,buffer,remaining);
                     remaining=0;
                 }
 
                 else{//else read 4096 bytes
-                    err=read(src_fd,buffer2,4096);
+                    err=read(src_fd,buffer,4096);
                     remaining-=4096;
                 }
 
@@ -318,12 +303,9 @@ int main(int argc,char* argv[])
                 if(n==0) break;
 
                 //write as many bytes as we read
-                err=write(dst_fd,buffer2,n);
+                err=write(dst_fd,buffer,n);
                 error(err,'d');
-                // free(buffer2);
             }
-            // free(filesize);
-            // free(filename);
         }
         //end of extraction operation
     }
@@ -357,7 +339,7 @@ int main(int argc,char* argv[])
         }
 
         //p contains the path of the newly created folder during individual dump
-        char *p=(char*)malloc(strlen(foldername)+35);
+        char *p=(char*)malloc(strlen(foldername)+17);
         strcpy(p,foldername);strcat(p,"/");strcat(p,"IndividualDump");
 
         //checking if such a folder already exists
@@ -387,7 +369,6 @@ int main(int argc,char* argv[])
         err=read(src_fd,buffer,1);
         error(err,'e');
         strcpy(filecount,buffer);
-        // free(buffer);
 
         while(1){
 
@@ -395,11 +376,9 @@ int main(int argc,char* argv[])
             err=read(src_fd,buffer,1);
             error(err,'e');
             if(buffer[0]=='\n'){
-                // free(buffer);
                 break;
             }
             strcat(filecount,buffer);
-            // free(buffer);
         }
         int fcount=atoi(filecount);//convert filecount to integer
 
@@ -412,7 +391,6 @@ int main(int argc,char* argv[])
             err=read(src_fd,buffer,1);
             error(err,'e');
             strcpy(filesize,buffer);
-            // free(buffer);
 
             while(1){
 
@@ -424,17 +402,15 @@ int main(int argc,char* argv[])
                     break;
                 }
                 strcat(filesize,buffer);
-                // free(buffer);
             }
             int fsize=atoi(filesize);//converting filesize to integer
 
             //read the filename
-            char *fname=(char*)malloc(20*sizeof(char));
+            char *fname=(char*)malloc(21*sizeof(char));
             buffer=(char*)malloc(1*sizeof(char));
             err=read(src_fd,buffer,1);
             error(err,'e');
             strcpy(fname,buffer);
-            // free(buffer);
 
             while(1){
 
@@ -446,7 +422,6 @@ int main(int argc,char* argv[])
                     break;
                 }
                 strcat(fname,buffer);
-                // free(buffer);
             } 
             
             //if filename matches the filename passed from console
@@ -467,29 +442,27 @@ int main(int argc,char* argv[])
             //read the contents of the file
             while(remaining>0){
 
-                char* buffer2=(char*)malloc(4096*sizeof(char));
+                buffer=(char*)malloc(4096*sizeof(char));
                 if(remaining<=4096){
-                    err=read(src_fd,buffer2,remaining);
+                    err=read(src_fd,buffer,remaining);
                     remaining=0;
                 }
 
                 else{
-                    err=read(src_fd,buffer2,4096);
+                    err=read(src_fd,buffer,4096);
                     remaining-=4096;
                 }
 
                 error(err,'e');
                 n=err;
                 if(n==0) break;
+
                 //if flag is 1, that means the file name matches the argument. We should write only in that case
                 if(flag){
-                    err=write(dst_fd,buffer2,n);
+                    err=write(dst_fd,buffer,n);
                     error(err,'e');
                 }
-                // free(buffer2);
             }
-            // free(filesize);
-            // free(fname);
             if(flag) break;
         }
 
@@ -509,9 +482,6 @@ int main(int argc,char* argv[])
             error(-1,'l');
         }
 
-        struct dirent *pDirent;
-        DIR *pDir;
-
         //storing the folderpath
         char *folderpath=malloc(strlen(argv[2]));
         int pos=-1;
@@ -524,12 +494,6 @@ int main(int argc,char* argv[])
         }
         for(int i=0;i<=pos;i++){
             folderpath[i]=argv[2][i];
-        }
-
-        //opening the folder
-        pDir=opendir(folderpath);
-        if(pDir==NULL){
-            error(-1,'l');
         }
 
         //name of the tar file
@@ -573,7 +537,6 @@ int main(int argc,char* argv[])
         err=read(src_fd,buffer,1);
         error(err,'l');
         strcpy(filecount,buffer);
-        // free(buffer);
 
         while(1){
 
@@ -585,13 +548,12 @@ int main(int argc,char* argv[])
                 break;
             }
             strcat(filecount,buffer);
-            // free(buffer);
         }
 
         //writing the filecount to the tarstructure file
         int fcount=atoi(filecount);
         sprintf(filecount,"%d",fcount);
-        err = write(dst_fd,filecount,1+(int)log10(fcount));
+        err = write(dst_fd,filecount,strlen(filecount));
         error(err,'l');
         err = write(dst_fd,"\n",1);
         error(err,'l');
@@ -606,7 +568,6 @@ int main(int argc,char* argv[])
             error(err,'l');
             if(err==0) break;
             strcpy(filesize,buffer);
-            // free(buffer);
 
             while(1){
             
@@ -618,7 +579,6 @@ int main(int argc,char* argv[])
                     break;
                 }
                 strcat(filesize,buffer);
-                // free(buffer);
             }
             int fsize=atoi(filesize);//converting the filesize to integer
 
@@ -628,7 +588,6 @@ int main(int argc,char* argv[])
             err=read(src_fd,buffer,1);
             error(err,'l');
             strcpy(filename,buffer);
-            // free(buffer);
             
             while(1){
                 
@@ -654,25 +613,22 @@ int main(int argc,char* argv[])
 
             //reading the contents of the file
             while(remaining>0){
-                char* buffer2 =(char*)malloc(4096*sizeof(char));
+                buffer =(char*)malloc(4096*sizeof(char));
 
                 if(remaining<=4096){
-                    err=read(src_fd,buffer2,remaining);
+                    err=read(src_fd,buffer,remaining);
                     remaining=0;
                 }
 
                 else{
-                    err=read(src_fd,buffer2,4096);
+                    err=read(src_fd,buffer,4096);
                     remaining-=4096;
                 }
 
                 error(err,'l');
                 n=err;
                 if(n==0) break;
-                // free(buffer2);
             }
-            // free(filesize);
-            // free(filename);
         }
     }
     else{
